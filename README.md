@@ -24,7 +24,7 @@ request (CSR). Here, we will create a CSR and a private ECDSA key with the
 
 ```
 $ openssl req -config config/openssl.cnf \
-> -newkey ec:config/ecparams -nodes -keyout private/ca.key \
+> -newkey ec:config/ecparams -nodes -keyout private/cakey.pem \
 > -out private/ca.csr
 ```
 
@@ -39,8 +39,8 @@ Once the CSR is created, we sign it with the `openssl ca` command. We pass in
 certificate.
 
 ```
-$ openssl ca -config -extensions v3_ca -enddate 99991231235959Z \
-> -in private/ca.csr -out cacert.pem
+$ openssl ca -config config/openssl.cnf -selfsign -extensions v3_ca \
+> -enddate 99991231235959Z -create_serial -in private/ca.csr -out cacert.pem
 ```
 
 Say `yes` to all prompts that proceed. The `-enddate 99991231235959Z` option is
@@ -82,7 +82,7 @@ user's username.
 
 ```
 $ openssl req -config config/openssl.cnf \
-> newkey ec:config/ecparams -nodes -keyout private/client-username.key \
+> -newkey ec:config/ecparams -nodes -keyout private/client-username.key \
 > -out private/client-username.csr
 
 $ openssl ca -config/openssl.cnf -extensions client_cert \
