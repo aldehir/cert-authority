@@ -59,8 +59,9 @@ $ openssl x509 -in cacert.pem -noout -text
 As with every certificate, you need to create a private key and generate a
 certificate signing request for the CA to sign. Servers also require a
 `subjectAltName` extension for specifying its fully-qualified domain name
-(FQDN). On newer versions of OpenSSL, you can do this with the `-addext`
-option when constructing the CSR.
+(FQDN). Without out, browsers will refuse to accept the server certificate. On
+newer versions of OpenSSL, you can do this with the `-addext` option when
+constructing the CSR.
 
 ```
 $ openssl req -config config/openssl.cnf \
@@ -68,8 +69,41 @@ $ openssl req -config config/openssl.cnf \
 > -out private/server-example.csr \
 > -addext 'subjectAltName=DNS:example.com'
 
-$ openssl ca -config/openssl.cnf -extensions server_cert \
+$ openssl ca -config config/openssl.cnf -extensions server_cert \
 > -in private/server-example.csr -out certs/server-example.pem
+```
+
+
+### Older OpenSSL Versions
+
+For older OpenSSL versions, you have to construct a configuration file
+containing the `subjectAltName`.
+
+Create a file, `req.cnf` containing the following contents.
+
+```
+[ req ]
+distinguished_name = req_distinguished_name
+req_extensions = req_ext
+prompt = no
+
+[ req_distinguished_name ]
+C = US
+ST = Texas
+L = Dallas
+O = AldeCorp
+CN = example.com
+
+[ req_ext ]
+subjectAltName = DNS:example.com
+```
+
+Then create the CSR.
+
+```
+$ openssl req -config req.cnf \
+> -newkey ec:config/ecparams -nodes -keyout private/server-example.key \
+> -out private/server-example.csr
 ```
 
 
