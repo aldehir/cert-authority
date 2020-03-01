@@ -79,7 +79,7 @@ $ openssl ca -config config/openssl.cnf -extensions server_cert \
 For older OpenSSL versions, you have to construct a configuration file
 containing the `subjectAltName`.
 
-Create a file, `req.cnf` containing the following contents.
+Create a file, `req.cnf`, containing the following contents.
 
 ```
 [ req ]
@@ -98,7 +98,7 @@ CN = example.com
 subjectAltName = DNS:example.com
 ```
 
-Then create the CSR.
+Then create the private key and CSR.
 
 ```
 $ openssl req -config req.cnf \
