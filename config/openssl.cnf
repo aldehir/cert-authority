@@ -92,7 +92,7 @@ basicConstraints = CA:FALSE
 
 nsCertType = server
 nsComment = "OpenSSL Generated Server Certificate"
-keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+keyUsage = digitalSignature, keyEncipherment
 
 subjectKeyIdentifier   = hash
 authorityKeyIdentifier = keyid,issuer
