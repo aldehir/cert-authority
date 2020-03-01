@@ -88,3 +88,31 @@ $ openssl req -config config/openssl.cnf \
 $ openssl ca -config/openssl.cnf -extensions client_cert \
 > -in private/client-username.csr -out certs/client-username.pem
 ```
+
+
+## Verifying Certificates
+
+The `openssl verify` command allows us to verify if our certificates are valid.
+
+```
+$ openssl verify -CAfile ./cacert.pem certs/server-example.pem certs/client-username.pem
+certs/server-example.pem: OK
+certs/client-username.pem: OK
+```
+
+To go one step further, you can verify if a certificate is valid as a client or
+as a server.
+
+```
+$ openssl verify -CAfile ./cacert.pem -purpose sslserver certs/server-example.pem
+certs/server-example.pem: OK
+```
+
+```
+$ openssl verify -CAfile ./cacert.pem -purpose sslclient certs/client-username.pem
+certs/server-example.pem: OK
+```
+
+If you wish to go even one step further, you can experiment with the `s_server`
+and `s_client` commands in OpenSSL to run an actual server/client with the
+certificates.
