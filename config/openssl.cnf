@@ -1,0 +1,137 @@
+[ ca ]
+default_ca = CA_default
+
+
+[ CA_default ]
+dir            = .
+certs          = $dir/certs
+crl_dir        = $dir/crl
+database       = $dir/index.txt
+unique_subject = no
+new_certs_dir  = $dir/newcerts
+
+certificate = $dir/cacert.pem
+serial      = $dir/serial
+crlnumber   = $dir/crlnumber
+crl         = $dir/crl.pem
+private_key = $dir/private/cakey.pem
+RANDFILE    = $dir/private/.rand
+
+x509_extensions = server_cert
+copy_extensions = copyall
+
+name_opt = ca_default
+cert_opt = ca_default
+
+crl_extensions = crl_ext
+
+default_days     = 1825
+default_crl_days = 30
+default_md       = sha256
+preserve         = no
+email_in_dn      = no 
+
+policy  = policy_match
+
+
+[ policy_match ]
+countryName            = match
+stateOrProvinceName    = match
+organizationName       = match
+organizationalUnitName = optional
+commonName             = supplied
+emailAddress           = optional
+
+
+[ policy_anything ]
+countryName            = optional
+stateOrProvinceName    = optional
+localityName           = optional
+organizationName       = optional
+organizationalUnitName = optional
+commonName             = supplied
+emailAddress           = optional
+
+
+[ req ]
+default_bits       = 4096
+default_keyfile    = privkey.pem
+distinguished_name = req_distinguished_name
+x509_extensions    = v3_req
+
+string_mask = utf8only
+
+
+[ req_distinguished_name ]
+countryName         = Country Name (2 letter code)
+countryName_default = US
+countryName_min     = 2
+countryName_max     = 2
+
+stateOrProvinceName         = State or Province Name (full name)
+stateOrProvinceName_default = Texas
+
+localityName = Locality Name (eg, city)
+localityName_default = Dallas
+
+0.organizationName         = Organization Name (eg, company)
+0.organizationName_default = AldeCorp
+
+organizationalUnitName  = Organizational Unit Name (eg, section)
+#organizationalUnitName_default =
+
+commonName     = Common Name (e.g. server FQDN or YOUR name)
+commonName_max = 64
+
+emailAddress     = Email Address
+emailAddress_max = 64
+
+
+[ server_cert ]
+basicConstraints = CA:FALSE
+
+nsCertType = server
+nsComment = "OpenSSL Generated Server Certificate"
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid,issuer
+
+subjectAltName = email:copy
+issuerAltName  = issuer:copy
+
+
+[ client_cert ]
+basicConstraints = CA:FALSE
+
+nsCertType = client
+nsComment  = "OpenSSL Generated Client Certificate"
+keyUsage   = nonRepudiation, digitalSignature, keyEncipherment
+
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid,issuer
+
+subjectAltName = email:copy
+issuerAltName  = issuer:copy
+
+
+[ v3_req ]
+basicConstraints = CA:FALSE
+keyUsage         = nonRepudiation, digitalSignature, keyEncipherment
+
+
+[ v3_ca ]
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid:always,issuer
+basicConstraints       = critical,CA:true
+
+nsCertType = sslCA
+keyUsage   = keyCertSign
+
+subjectAltName = email:copy
+issuerAltName = issuer:copy
+
+
+[ crl_ext ]
+# issuerAltName=issuer:copy
+authorityKeyIdentifier=keyid:always

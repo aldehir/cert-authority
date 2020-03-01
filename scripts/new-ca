@@ -1,0 +1,83 @@
+#!/bin/bash
+#
+# Generate a new CA by creating a CSR and self-signing it.
+#
+
+root="$(dirname "$(dirname "$0")")"
+source "$root/scripts/helpers.sh"
+
+csr_file="$root/private/ca.csr"
+
+key_created=0
+csr_created=0
+
+
+create_ca() {
+  if [[ -e "$ca_cert" ]]; then
+    ask_yes "CA certificate already exists, recreate?" || return 1
+  fi
+
+  return 0
+}
+
+create_key() {
+  if [[ -e "$ca_key" ]]; then
+    ask_yes "CA private key already exists, recreate?" || return 1
+  fi
+
+  return 0
+}
+
+
+create_csr() {
+  [[ "$key_created" -eq 1 ]] && return 0
+
+  if [[ -e "$csr_file" ]]; then
+    ask_yes "CA CSR already exists, recreate?" || return 1
+  fi
+
+  return 0
+}
+
+if ! create_ca; then
+  exit
+fi
+
+if create_key; then
+  echo "==> Create Private Key ($ca_key)"
+  openssl genpkey -out "$ca_key" -paramfile "$ecparams" -algorithm EC
+  echo
+
+  key_created=1
+fi
+
+if create_csr; then
+  echo "==> Create Certificate Signing Request ($csr_file)"
+  openssl req "${default_opts[@]}" \
+    -new \
+    -key "$ca_key" \
+    -extensions v3_ca \
+    -out "$csr_file"
+  echo
+fi
+
+# If we're creating a new CA cert, then we need to clear out the database and
+# serial.
+echo "==> Initialize CA database"
+truncate -s0 index.txt{,.attr,.old}
+rm -f serial{,.old}
+rm -f newcerts/*.pem
+
+echo "==> Create CA Certificate ($ca_cert)"
+openssl ca "${default_opts[@]}" \
+  -extensions v3_ca \
+  -enddate "$never_expire" \
+  -keyfile "$ca_key" \
+  -in "$csr_file" \
+  -create_serial \
+  -out "$ca_cert" \
+  -selfsign
+echo
+
+echo "==> Clean up"
+rm -f "$csr_file"
